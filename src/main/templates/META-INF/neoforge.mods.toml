@@ -46,7 +46,7 @@ displayName="${mod_name}" #mandatory
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Pin books and schematics as a floating HUD overlay.
+Pin books as a floating HUD overlay. Optional Create integration adds support for pinning schematics as a material list.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
@@ -90,7 +90,8 @@ Pin books and schematics as a floating HUD overlay.
 
 [[dependencies.${mod_id}]]
     modId="create"
-    type="required"
+    type="optional"
+    reason="Enables pinning Create schematics as a material list"
     versionRange="[6.0.10,)"
     ordering="AFTER"
     side="BOTH"
