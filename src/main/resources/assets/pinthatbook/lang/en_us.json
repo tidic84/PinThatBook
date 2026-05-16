@@ -1,0 +1,10 @@
+{
+  "pinthatbook.configuration.title": "Pin That Book",
+  "pinthatbook.draft_title": "Draft",
+  "pinthatbook.empty_book": "(empty)",
+  "key.categories.pinthatbook": "Pin That Book",
+  "key.pinthatbook.pin": "Pin held book",
+  "key.pinthatbook.next_page": "Next page",
+  "key.pinthatbook.prev_page": "Previous page",
+  "key.pinthatbook.toggle_visibility": "Show/hide pinned book"
+}
