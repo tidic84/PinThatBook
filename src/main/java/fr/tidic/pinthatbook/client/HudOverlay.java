@@ -15,7 +15,6 @@ public class HudOverlay implements LayeredDraw.Layer {
     private static final int PADDING = 5;
     private static final int BG_COLOR = 0xC0101010;
     private static final int BORDER_COLOR = 0xFF707070;
-    private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int TITLE_COLOR = 0xFFFFE070;
     private static final int META_COLOR = 0xFFAAAAAA;
 
@@ -32,9 +31,7 @@ public class HudOverlay implements LayeredDraw.Layer {
         int screenH = graphics.guiHeight();
 
         int page = PinnedBookState.page();
-        Component pageContent = book.pages().isEmpty()
-                ? Component.translatable("pinthatbook.empty_book")
-                : book.pages().get(page);
+        Component pageContent = book.renderPage(page);
 
         int innerWidth = WIDTH - PADDING * 2;
         List<FormattedCharSequence> titleLines = font.split(book.title(), innerWidth);
@@ -59,13 +56,13 @@ public class HudOverlay implements LayeredDraw.Layer {
             textY += lineH;
         }
 
-        Component pageInfo = Component.literal((page + 1) + "/" + Math.max(1, book.pageCount()));
+        Component pageInfo = Component.literal((page + 1) + "/" + book.pageCount());
         graphics.drawString(font, pageInfo, x + WIDTH - PADDING - font.width(pageInfo), textY, META_COLOR, false);
         textY += lineH;
 
         for (FormattedCharSequence line : bodyLines) {
             if (textY + font.lineHeight > y + height - PADDING) break;
-            graphics.drawString(font, line, x + PADDING, textY, TEXT_COLOR, false);
+            graphics.drawString(font, line, x + PADDING, textY, -1, false);
             textY += lineH;
         }
     }

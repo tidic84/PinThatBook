@@ -3,8 +3,8 @@ package fr.tidic.pinthatbook.client.compat;
 import com.simibubi.create.AllDataComponents;
 import fr.tidic.pinthatbook.PinThatBook;
 import fr.tidic.pinthatbook.client.PinnedBook;
+import fr.tidic.pinthatbook.client.SchematicPin;
 import fr.tidic.pinthatbook.client.SchematicReader;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -12,7 +12,6 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CreateSchematicReader implements SchematicReader {
-    private static final int ENTRIES_PER_PAGE = 8;
 
     @Override
     public Optional<PinnedBook> read(ItemStack stack) {
@@ -47,7 +45,7 @@ public class CreateSchematicReader implements SchematicReader {
 
         try {
             CompoundTag root = NbtIo.readCompressed(target, NbtAccounter.unlimitedHeap());
-            return Optional.of(buildBook(file, root));
+            return Optional.of(buildPin(file, root));
         } catch (IOException e) {
             PinThatBook.LOGGER.warn("Failed to read schematic {}", target, e);
             return Optional.empty();
@@ -59,37 +57,19 @@ public class CreateSchematicReader implements SchematicReader {
         return id.getNamespace().equals("create") && id.getPath().equals("schematic");
     }
 
-    private static PinnedBook buildBook(String filename, CompoundTag root) {
+    private static SchematicPin buildPin(String filename, CompoundTag root) {
         Map<Block, Integer> counts = countBlocks(root);
-
-        List<Map.Entry<Block, Integer>> sorted = counts.entrySet().stream()
+        List<SchematicPin.Entry> entries = counts.entrySet().stream()
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
+                .map(e -> new SchematicPin.Entry(e.getKey(), e.getValue()))
                 .toList();
-
-        List<Component> pages = new ArrayList<>();
-        if (sorted.isEmpty()) {
-            pages.add(Component.translatable("pinthatbook.empty_schematic"));
-        } else {
-            for (int i = 0; i < sorted.size(); i += ENTRIES_PER_PAGE) {
-                int end = Math.min(i + ENTRIES_PER_PAGE, sorted.size());
-                MutableComponent page = Component.empty();
-                for (int j = i; j < end; j++) {
-                    Map.Entry<Block, Integer> entry = sorted.get(j);
-                    page.append(entry.getKey().getName().copy().withStyle(ChatFormatting.WHITE));
-                    page.append(Component.literal(" × ").withStyle(ChatFormatting.GRAY));
-                    page.append(Component.literal(String.valueOf(entry.getValue())).withStyle(ChatFormatting.YELLOW));
-                    if (j < end - 1) page.append(Component.literal("\n"));
-                }
-                pages.add(page);
-            }
-        }
 
         String title = filename;
         if (title.endsWith(".nbt")) title = title.substring(0, title.length() - 4);
         int slash = Math.max(title.lastIndexOf('/'), title.lastIndexOf('\\'));
         if (slash >= 0) title = title.substring(slash + 1);
 
-        return new PinnedBook(Component.literal(title), pages);
+        return new SchematicPin(Component.literal(title), entries);
     }
 
     private static Map<Block, Integer> countBlocks(CompoundTag root) {

@@ -7,5 +7,6 @@
   "key.pinthatbook.pin": "Pin held book",
   "key.pinthatbook.next_page": "Next page",
   "key.pinthatbook.prev_page": "Previous page",
-  "key.pinthatbook.toggle_visibility": "Show/hide pinned book"
+  "key.pinthatbook.toggle_visibility": "Show/hide pinned book",
+  "key.pinthatbook.toggle_progress": "Toggle inventory progress"
 }

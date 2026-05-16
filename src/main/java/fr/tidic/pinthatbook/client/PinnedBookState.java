@@ -16,6 +16,7 @@ public class PinnedBookState {
     private static ItemStack pinnedStack = ItemStack.EMPTY;
     private static int page;
     private static boolean visible = true;
+    private static boolean progressTracking = true;
 
     public static Optional<PinnedBook> get() {
         return Optional.ofNullable(pinned);
@@ -33,9 +34,18 @@ public class PinnedBookState {
         return visible;
     }
 
+    public static boolean isProgressTracking() {
+        return progressTracking;
+    }
+
     public static void toggleVisible() {
         if (pinned == null) return;
         visible = !visible;
+        PinPersistence.save();
+    }
+
+    public static void toggleProgressTracking() {
+        progressTracking = !progressTracking;
         PinPersistence.save();
     }
 
@@ -73,13 +83,14 @@ public class PinnedBookState {
         PinPersistence.save();
     }
 
-    public static void restoreFrom(ItemStack stack, int savedPage, boolean savedVisible) {
+    public static void restoreFrom(ItemStack stack, int savedPage, boolean savedVisible, boolean savedProgress) {
         Optional<PinnedBook> book = readBook(stack);
         if (book.isEmpty()) return;
         pinned = book.get();
         pinnedStack = stack.copy();
         page = Math.max(0, Math.min(savedPage, pinned.pageCount() - 1));
         visible = savedVisible;
+        progressTracking = savedProgress;
     }
 
     private static Optional<PinnedBook> readBook(ItemStack stack) {
@@ -89,14 +100,14 @@ public class PinnedBookState {
             Component title = Component.literal(content.title().raw());
             List<Component> pages = new ArrayList<>();
             content.pages().forEach(f -> pages.add(f.raw()));
-            return Optional.of(new PinnedBook(title, pages));
+            return Optional.of(new BookPin(title, pages));
         }
         if (stack.is(Items.WRITABLE_BOOK)) {
             WritableBookContent content = stack.get(DataComponents.WRITABLE_BOOK_CONTENT);
             if (content == null) return Optional.empty();
             List<Component> pages = new ArrayList<>();
             content.pages().forEach(f -> pages.add(Component.literal(f.raw())));
-            return Optional.of(new PinnedBook(Component.translatable("pinthatbook.draft_title"), pages));
+            return Optional.of(new BookPin(Component.translatable("pinthatbook.draft_title"), pages));
         }
         return SchematicReaders.INSTANCE.read(stack);
     }

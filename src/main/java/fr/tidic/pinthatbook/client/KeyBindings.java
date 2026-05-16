@@ -36,5 +36,12 @@ public final class KeyBindings {
             CATEGORY
     );
 
+    public static final KeyMapping TOGGLE_PROGRESS = new KeyMapping(
+            "key.pinthatbook.toggle_progress",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_I),
+            CATEGORY
+    );
+
     private KeyBindings() {}
 }

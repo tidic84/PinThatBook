@@ -17,6 +17,7 @@ public class ClientModBusEvents {
         event.register(KeyBindings.NEXT_PAGE);
         event.register(KeyBindings.PREV_PAGE);
         event.register(KeyBindings.TOGGLE_VISIBILITY);
+        event.register(KeyBindings.TOGGLE_PROGRESS);
     }
 
     @SubscribeEvent

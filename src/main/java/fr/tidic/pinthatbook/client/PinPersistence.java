@@ -31,6 +31,7 @@ public final class PinPersistence {
                 root.put("stack", stack.save(registries));
                 root.putInt("page", PinnedBookState.page());
                 root.putBoolean("visible", PinnedBookState.isVisible());
+                root.putBoolean("progress", PinnedBookState.isProgressTracking());
             }
             Files.createDirectories(FILE.getParent());
             NbtIo.writeCompressed(root, FILE);
@@ -50,7 +51,8 @@ public final class PinPersistence {
             ItemStack.parse(registries, stackTag).ifPresent(stack -> {
                 int page = root.getInt("page");
                 boolean visible = !root.contains("visible") || root.getBoolean("visible");
-                PinnedBookState.restoreFrom(stack, page, visible);
+                boolean progress = !root.contains("progress") || root.getBoolean("progress");
+                PinnedBookState.restoreFrom(stack, page, visible, progress);
             });
         } catch (IOException e) {
             PinThatBook.LOGGER.warn("Failed to load pinned book", e);
